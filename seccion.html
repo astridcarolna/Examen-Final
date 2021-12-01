@@ -1,0 +1,276 @@
+<!DOCTYPE html> 
+<html>
+<head>
+<b><a name="menu"></a><br>
+<title>Brila</title>
+<h1 align="center"><font color="6b705c" size="27">Artículos de hombres</h1>
+<hr size="2" width="100%" color="#F5DC85 " noshades>
+<hr size="2" width="50%" color="#F5DC85 " noshades>
+</font>
+
+
+ <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script>
+        window.onload = function () {
+          // Variables
+          const baseDeDatos = [
+              {
+                  id: 1,
+                  nombre: 'Collares',
+                  precio: 29.99,
+                  imagen: 'collar4-.png'
+              },
+              {
+                  id: 2,
+                  nombre: 'Anillos',
+                  precio:  26.00,
+                  imagen: 'anillo4-.png'
+              },
+              {
+                  id: 3,
+                  nombre: 'Dijes',
+                  precio: 24.99,
+                  imagen: 'dije2-.png'
+              },
+              {
+                  id: 4,
+                  nombre: 'Brila Forever',
+                  precio: 67.89,
+                  imagen: 'dije3-.png'
+              },
+              {
+                  id: 3,
+                  nombre: 'Collares de hombre',
+                  precio: 24.99,
+                  imagen: 'dije.jpeg'
+              },
+              {
+                  id: 4,
+                  nombre: 'Anillo de oro',
+                  precio: 67.89,
+                  imagen: 'oro.jpeg'
+              }
+               
+          ];
+
+          let carrito = [];
+          let total = 0;
+          const DOMitems = document.querySelector('#items');
+          const DOMcarrito = document.querySelector('#carrito');
+          const DOMtotal = document.querySelector('#total');
+          const DOMbotonVaciar = document.querySelector('#boton-vaciar');
+
+     
+          function renderizarProductos() {
+              baseDeDatos.forEach((info) => {
+                  // Estructura
+                  const miNodo = document.createElement('div');
+                  miNodo.classList.add('card', 'col-sm-4');
+                  // Body
+                  const miNodoCardBody = document.createElement('div');
+                  miNodoCardBody.classList.add('card-body');
+                  // Titulo
+                  const miNodoTitle = document.createElement('h5');
+                  miNodoTitle.classList.add('card-title');
+                  miNodoTitle.textContent = info.nombre;
+                  // Imagen
+                  const miNodoImagen = document.createElement('img');
+                  miNodoImagen.classList.add('img-fluid');
+                  miNodoImagen.setAttribute('src', info.imagen);
+                  //Precio
+                  const miNodoPrecio = document.createElement('p');
+                  miNodoPrecio.classList.add('card-text');
+                  miNodoPrecio.textContent = info.precio + '$';
+                
+                  const miNodoBoton = document.createElement('button');
+                  miNodoBoton.classList.add('btn', 'btn-primary');
+                  miNodoBoton.textContent = '+';
+                  miNodoBoton.setAttribute('marcador', info.id);
+                  miNodoBoton.addEventListener('click', anyadirProductoAlCarrito);
+                  
+                  miNodoCardBody.appendChild(miNodoImagen);
+                  miNodoCardBody.appendChild(miNodoTitle);
+                  miNodoCardBody.appendChild(miNodoPrecio);
+                  miNodoCardBody.appendChild(miNodoBoton);
+                  miNodo.appendChild(miNodoCardBody);
+                  DOMitems.appendChild(miNodo);
+              });
+          }
+
+   
+          function anyadirProductoAlCarrito(evento) {
+              carrito.push(evento.target.getAttribute('marcador'))
+         
+              calcularTotal();
+
+              renderizarCarrito();
+
+          }
+
+
+          function renderizarCarrito() {
+     
+              DOMcarrito.textContent = '';
+           
+              const carritoSinDuplicados = [...new Set(carrito)];
+    
+              carritoSinDuplicados.forEach((item) => {
+              
+                  const miItem = baseDeDatos.filter((itemBaseDatos) => {
+          
+                      return itemBaseDatos.id === parseInt(item);
+                  });
+              
+                  const numeroUnidadesItem = carrito.reduce((total, itemId) => {
+            
+                      return itemId === item ? total += 1 : total;
+                  }, 0);
+                  const miNodo = document.createElement('li');
+                  miNodo.classList.add('list-group-item', 'text-right', 'mx-2');
+                  miNodo.textContent = `${numeroUnidadesItem} x ${miItem[0].nombre} - ${miItem[0].precio}$`;
+              
+                  const miBoton = document.createElement('button');
+                  miBoton.classList.add('btn', 'btn-danger', 'mx-5');
+                  miBoton.textContent = 'X';
+                  miBoton.style.marginLeft = '1rem';
+                  miBoton.dataset.item = item;
+                  miBoton.addEventListener('click', borrarItemCarrito);
+                  miNodo.appendChild(miBoton);
+                  DOMcarrito.appendChild(miNodo);
+              });
+          }
+
+    
+          function borrarItemCarrito(evento) {
+     
+              const id = evento.target.dataset.item;
+           
+              carrito = carrito.filter((carritoId) => {
+                  return carritoId !== id;
+              });
+      
+              calcularTotal();
+          }
+
+  
+          function calcularTotal() {
+           
+              total = 0;
+              carrito.forEach((item) => {
+               
+                  const miItem = baseDeDatos.filter((itemBaseDatos) => {
+                      return itemBaseDatos.id === parseInt(item);
+                  });
+                  total = total + miItem[0].precio;
+              })
+              DOMtotal.textContent = total.toFixed(2);
+          }
+
+     
+          function vaciarCarrito() {
+          
+              carrito = [];
+              renderizarCarrito();
+              calcularTotal();
+          }
+
+      
+          DOMbotonVaciar.addEventListener('click', vaciarCarrito);
+
+          // Inicio
+          renderizarProductos();
+
+
+        } 
+    </script>
+</head>
+<body bgcolor="b7e4c7">
+    <div class="container">
+        <div class="row">
+            <!-- Elementos generados a partir del JSON -->
+            <main id="items" class="col-sm-8 row"></main>
+            <!-- Carrito -->
+            <aside class="col-sm-4">
+                <h2>Carrito</h2>
+                <!-- Elementos del carrito -->
+                <ul id="carrito" class="list-group"></ul>
+                <hr>
+                <!-- Precio total -->
+                <p class="text-right">Total: <span id="total"></span>&euro;</p>
+                <button id="boton-vaciar" class="btn btn-danger">Vaciar</button>
+            </aside>
+        </div>
+   
+<b> 
+</head>
+<body bgcolor="b7e4c7"> 
+<table  align="center" width="80%" size="5">
+<tr>
+<th align="center"><font color="001219">Anillos</th>
+<th align="center"><font color="001219">Collares</th>
+<th align="center"><font color="001219">Dijes</th>
+</tr
+<h2 align="center"><font color="FFFFF" size="27">Artículos</h2>
+
+
+<tr>
+<td align="center" width="90" heigth="90"> <img src="anillo1 Ramsés.PNG" width="200" heigth="100">
+<p>
+<a href="https://www.joyeriaeldiamante.com.mx/home/anillos/539-anillo-para-nino-tipo-ingles-en-plata.html"><font color="001219">Anillos de plata para niños$29.99</a></td>  </font>
+<td align="center" width="90" heigth="90"> <img src="collar1-.png" width="100" heigth="100">
+<p>
+<a href="https://www.amazon.com/Colgante-blanco-quilates-cadena-claridad/dp/B08BQW8QS5/ref=sr_1_1_sspa?__mk_es_US=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=children%27s+necklaces&qid=1638231459&sr=8-1-spons&psc=1&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUExQ1M4NVBIWTM5OU4xJmVuY3J5cHRlZElkPUEwMzc0NjY2WlpOVzdDTUdQSE5WJmVuY3J5cHRlZEFkSWQ9QTA4NTAxNjIzRVVBMzJOQ0oyRFpCJndpZGdldE5hbWU9c3BfYXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ=="><font color="001219">Collares de plata para niños$ 26.00</a></td></font>  
+<td align="center" width="90" heigth="90"> <img src="dije1-.png" width="200" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/Getname-personalizado-grabado-encanto-colgante/dp/B07S22GT9V"><font color="001219">Dijes de plata para niños$24.99</a></td></font>
+</tr>
+<tr> 
+<td align="center" width="90" heigth="90"><img src="anillo2-.png" width="150" heigth="100">
+<p>
+<a href="https://es.dhgate.com/product/high-quality-blue-black-color-fashion-simple/436686339.html"><font color="001219">Anillo de niño con luces$ 19.99</a></td></font>
+<td align="center" width="90" heigth="90"> <img src="collar2-.png" width="150" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/Collar-colgante-f%C3%BAtbol-graduaci%C3%B3n-amistad/dp/B07CGGH3M9"><font color="001219">Collares de niños con conjuntos$ 25.00</a></td> </font> 
+<td align="center" width="90" heigth="90"> <img src="dije2-.png" width="150" heigth="90">
+<p>
+<a href="https://www.onecklace.es/collar-de-dijes-de-ninos-para-madre/"><font color="001219">Dije con buena calidad$ 59.88</a></td></font>
+</tr>
+<br>
+<table>
+
+
+<table  align="center" width="80%" size="5">
+<tr>
+<th align="center"><font color="001219">Anillos</th>
+<th align="center"><font color="001219">Collares</th>
+<th align="center"><font color="001219">Dijes</th>
+</tr>
+<tr>
+<td align="center" width="150" heigth="100"> <img src="anillo3-.png" width="120" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/anillos-inoxidable-Jstyle-hombre-giratorios/dp/B073WSRXKL"><font color="001219">Anillos de hombre con diseño$29.99</a></td> </font> 
+<td align="center" width="150" heigth="100"> <img src="collar3-.png" width="120" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/Jstyle-collares-colgantes-inoxidable-hombre/dp/B089MBPYD1"><font color="001219">Collares de hombre elegante$ 26.00</a></td>  </font>
+<td align="center" width="150" heigth="100"> <img src="dije3-.png" width="120" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/Collar-cadena-cable-hombre-oradora/dp/B01HW8MWSU"><font color="001219">Dijes de hombre con diseño$24.99</a></td></font>
+</tr>
+
+<tr>
+<td align="center" width="150" heigth="100"> <img src="anillo4-.png" width="120" heigth="100">
+<p>
+<a href="https://www.amazon.com/-/es/chimoda-Anillos-solitarios-hombre-piedra/dp/B075XS3RQQ"><font color="001219">Anillos de hombre con diseño$29.99</a></td>  </font>
+<td align="center" width="150" heigth="100"> <img src="collar4-.png" width="120" heigth="100">
+<p>
+<a href="https://www.ebay.com/itm/202660606520"><font color="001219">Collares de hombre elegante$ 26.00</a></td>  </font>
+<td align="center" width="150" heigth="100"> <img src="dijes4-.png" width="120" heigth="100">
+<p>
+<a href="https://www.joyasorrpo.com/producto/dijes-para-hombre-en-plata-2/"><font color="001219">Dijes de hombre con diseño$24.99</a></td></font>
+</tr>
+
+</body>
+</html>
